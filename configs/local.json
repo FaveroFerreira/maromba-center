@@ -1,0 +1,3 @@
+{
+    "databaseUrl": "postgres://root:root@localhost:5432/maromba_db"
+}
