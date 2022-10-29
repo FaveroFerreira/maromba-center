@@ -3,6 +3,7 @@ package internal
 import (
 	"github.com/faveroferreira/maromba-center/internal/controllers"
 	"github.com/faveroferreira/maromba-center/internal/db"
+	"github.com/faveroferreira/maromba-center/internal/services"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
@@ -10,7 +11,6 @@ import (
 
 func StartGin(profile string) {
 	SetGinMode(profile)
-
 	server := gin.New()
 	server.Use(gin.Recovery(), gin.LoggerWithWriter(gin.DefaultWriter))
 	db_url := viper.Get("databaseUrl").(string)
@@ -24,18 +24,20 @@ func StartGin(profile string) {
 
 func SetupApplication(server *gin.Engine, db *gorm.DB) *gin.Engine {
 	healthController := controllers.HealthController{}
-	crud_handler := &controllers.Handler{
-		DB: db,
+	trainersController := &controllers.TrainerController{
+		Services: &services.TrainerServices{
+			DB: db,
+		},
 	}
 
 	server.GET("/health", healthController.HealthCheck)
 
-	trainer_routes := server.Group("/trainers")
-	trainer_routes.POST("/", crud_handler.AddTrainer)
-	trainer_routes.GET("/", crud_handler.GetTrainers)
-	trainer_routes.GET("/:id", crud_handler.GetTrainer)
-	trainer_routes.PUT("/:id", crud_handler.UpdateTrainer)
-	trainer_routes.DELETE("/:id", crud_handler.DeleteTrainer)
+	trainers_routes := server.Group("/trainers")
+	trainers_routes.POST("/", trainersController.CreateTrainer)
+	trainers_routes.GET("/:id", trainersController.GetTrainerById)
+	trainers_routes.GET("/", trainersController.GetAllTrainers)
+	trainers_routes.PUT("/:id", trainersController.UpdateTrainer)
+	trainers_routes.DELETE("/:id", trainersController.DeleteTrainer)
 
 	return server
 }

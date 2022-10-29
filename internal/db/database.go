@@ -1,7 +1,7 @@
 package db
 
 import (
-	"github.com/faveroferreira/maromba-center/internal/db/models"
+	"github.com/faveroferreira/maromba-center/internal/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
